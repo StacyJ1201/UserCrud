@@ -7,12 +7,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class Post {
 	
 	@Id
@@ -43,6 +42,5 @@ public class Post {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
 
 }

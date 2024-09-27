@@ -3,16 +3,12 @@ package com.example.userscrud.controller;
 import java.net.URI;
 import java.util.List;
 
+import com.example.userscrud.exception.DuplicateUsersException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.userscrud.entity.Post;
@@ -27,8 +23,9 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-	
+	@Autowired
 	private UserService userService;
+	@Autowired
 	private PostService postService;
 	
 	public UserController(UserService userService, PostService postService) {
@@ -83,6 +80,22 @@ public class UserController {
 				.fromCurrentRequest().path("")
 				.buildAndExpand(savedPost.getId()).toUri();
 		return ResponseEntity.created(location).build();
+	}
+
+	@RequestMapping("/test")
+	public String test(){
+		return "This shit is working";
+	}
+
+	@DeleteMapping("/{name}")
+	public ResponseEntity<?> deleteByName(@PathVariable String name){
+		userService.deleteUserByName(name);
+		return ResponseEntity.noContent().build();
+	}
+
+	@ExceptionHandler(DuplicateUsersException.class)
+	public ResponseEntity<String> duplicateUsersException(DuplicateUsersException e){
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 	}
 	
 
