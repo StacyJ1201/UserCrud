@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.userscrud.entity.User;
 import com.example.userscrud.exception.UserNotFoundException;
 import com.example.userscrud.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,15 +49,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteUserByName(String name) {
-		List<User> users = getUserByName(name);
-		if(users.size() > 1){
-			throw new DuplicateUsersException("You have more than one user with that name");
-		} else if(users.size() == 1) {
-			userRepository.deleteByName(name);
-		} else {
-			throw new UserNotFoundException("There are no users with that name");
+		List<User> users = userRepository.findByName(name);
+		if (users.isEmpty()) {
+			throw new UserNotFoundException("User with name: " + name + " doesn't exist.");
+		} else if (users.size() > 1) {
+			throw new DuplicateUsersException("Cannot delete this user because there are two users with this name.");
 		}
+		userRepository.deleteByName(name); // Use the deleteByName method here
 	}
+
 
 }
